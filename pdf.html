@@ -50,7 +50,7 @@
         fetch(pdfUrl)
         .then(response => { 
             print(response.headers.get("Content-Type"));
-            response.blob();}) // Or response.json() / response.blob()
+            return response.blob();}) // Or response.json() / response.blob()
         .then(data => {
             console.log('File Content:', data);
         });

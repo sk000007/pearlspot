@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript PDF Page-by-Page Viewer</title>
+    <!-- Include PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js" integrity="sha512-Z8CqofpIcnJN80feS2uccz+pXWgZzeKxDsDNMD/dJ6997/LSRY+W4NmEt9acwR+Gt9OHN0kkI1CTianCwoqcjQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.entry.min.js" integrity="sha512-NJEHr6hlBM4MkVxJu+7FBk+pn7r+KD8rh+50DPglV/8T8I9ETqHJH0bO7NRPHaPszzYTxBWQztDfL6iJV6CQTw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js" integrity="sha512-lHibs5XrZL9hXP3Dhr/d2xJgPy91f2mhVAasrSbMkbmoTSm2Kz8DuSWszBLUg31v+BM6tSiHSqT72xwjaNvl0g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf_viewer.min.css" integrity="sha512-5cOE2Zw/F4SlIUHR/xLTyFLSAR0ezXsra+8azx47gJyQCilATjazEE2hLQmMY7xeAv/RxxZhs8w8zEL7dTsvnA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f4f4; }
+        .toolbar { margin: 15px; }
+        button { padding: 8px 15px; font-size: 16px; cursor: pointer; }
+        #canvas_container { 
+            max-width: 90%; margin: 20px auto; background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); overflow: auto;
+        }
+        canvas { display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <button id="prev_page">Previous</button>
+        <span id="page_info">Page: <span id="page_num">0</span> / <span id="page_count">0</span></span>
+        <button id="next_page">Next</button>
+    </div>
+
+    <div id="canvas_container">
+        <canvas id="pdf_renderer"></canvas>
+    </div>
+
+    <script>
+        // Set the worker URL pointing to the cloudflare CDN
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
+
+        // Application state tracker
+        const state = {
+            pdf: null,
+            currentPage: 1,
+            zoom: 1.5
+        };
+
+        // Replace this with your actual PDF file path or URL
+        //const pdfUrl = 'https://drive.google.com/file/d/1GXIMaYohObaW2bGAH4v_nhXcb74Pi_Xr/view?usp=sharing';
+        const pdfUrl = 'https://pearlspotsystems.com/health/4196ZG0010524182_414051u.pdf'
+        fetch(pdfUrl)
+        .then(response => { 
+            print(response.headers.get("Content-Type"));
+            response.text();}) // Or response.json() / response.blob()
+        .then(data => {
+            console.log('File Content:', data);
+        });
+        /*
+        // Load the PDF Document
+        pdfjsLib.getDocument(pdfUrl).promise.then((pdfDoc) => {
+            state.pdf = pdfDoc;
+            document.getElementById('page_count').textContent = pdfDoc.numPages;
+            renderPage();
+        }).catch(err => {
+            console.error('Error loading PDF: ', err);
+            alert('Failed to load PDF. Check console or CORS settings.');
+        });
+        */
+        // Function to render a single targeted page
+        function renderPage() {
+            state.pdf.getPage(state.currentPage).then((page) => {
+                const canvas = document.getElementById('pdf_renderer');
+                const ctx = canvas.getContext('2d');
+
+                // Determine viewport sizing based on chosen zoom factor
+                const viewport = page.getViewport({ scale: state.zoom });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                // Render page content directly onto the HTML5 Canvas
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                page.render(renderContext);
+                
+                // Track and display the active page index
+                document.getElementById('page_num').textContent = state.currentPage;
+            });
+        }
+
+        // Navigation Button Listeners
+        document.getElementById('prev_page').addEventListener('click', () => {
+            if (state.pdf === null || state.currentPage <= 1) return;
+            state.currentPage--;
+            renderPage();
+        });
+
+        document.getElementById('next_page').addEventListener('click', () => {
+            if (state.pdf === null || state.currentPage >= state.pdf.numPages) return;
+            state.currentPage++;
+            renderPage();
+        });
+    </script>
+</body>
+</html>

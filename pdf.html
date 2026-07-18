@@ -58,6 +58,7 @@
         });
         
         if (blob_content != null) {
+            console.log('in.........................')
             // Load the PDF Document
             pdfjsLib.getDocument({data:blob_content}).promise.then((pdfDoc) => {
                 state.pdf = pdfDoc;

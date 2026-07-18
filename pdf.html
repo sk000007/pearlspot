@@ -54,7 +54,7 @@
             
         }).then(data=>{
             console.log('File Content:', data);
-            blob_content = Uint8Array(data);
+            blob_content = new Uint8Array(data);
         });
         
         if (blob_content != null) {

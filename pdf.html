@@ -59,7 +59,7 @@
         
         if (blob_content != null) {
             // Load the PDF Document
-            pdfjsLib.getDocument(data:blob_content).promise.then((pdfDoc) => {
+            pdfjsLib.getDocument({data:blob_content}).promise.then((pdfDoc) => {
                 state.pdf = pdfDoc;
                 document.getElementById('page_count').textContent = pdfDoc.numPages;
                 renderPage();

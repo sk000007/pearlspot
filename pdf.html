@@ -40,7 +40,7 @@
             currentPage: 1,
             zoom: 1.5
         };
-
+        var blob_content=null
         // Replace this with your actual PDF file path or URL
         //const pdfUrl = 'https://drive.google.com/file/d/1GXIMaYohObaW2bGAH4v_nhXcb74Pi_Xr/view?usp=sharing';
         const pdfUrl = 'https://pearlspotsystems.com/health/4196ZG0010524182_414051u'
@@ -54,18 +54,20 @@
             
         }).then(data=>{
             console.log('File Content:', data);
+            blob_content = Uint8Array(data);
         });
-        /*
-        // Load the PDF Document
-        pdfjsLib.getDocument(pdfUrl).promise.then((pdfDoc) => {
-            state.pdf = pdfDoc;
-            document.getElementById('page_count').textContent = pdfDoc.numPages;
-            renderPage();
-        }).catch(err => {
-            console.error('Error loading PDF: ', err);
-            alert('Failed to load PDF. Check console or CORS settings.');
-        });
-        */
+        
+        if (blob_content != null) {
+            // Load the PDF Document
+            pdfjsLib.getDocument(data:blob_content).promise.then((pdfDoc) => {
+                state.pdf = pdfDoc;
+                document.getElementById('page_count').textContent = pdfDoc.numPages;
+                renderPage();
+            }).catch(err => {
+                console.error('Error loading PDF: ', err);
+                alert('Failed to load PDF. Check console or CORS settings.');
+            });
+        }
         // Function to render a single targeted page
         function renderPage() {
             state.pdf.getPage(state.currentPage).then((page) => {

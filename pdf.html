@@ -16,6 +16,11 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2); overflow: auto;
         }
         canvas { display: block; margin: 0 auto; }
+        @media print {
+            .no-print, .no-print * {
+                 display: none !important;
+             }
+        }
     </style>
 </head>
 <body>
@@ -49,7 +54,7 @@
         const pdfUrl = 'https://pearlspotsystems.com/health/4196ZG0010524182_414051u'
         fetch(pdfUrl)
         .then(response => { 
-            print(response.headers.get("Content-Type"));
+            //print(response.headers.get("Content-Type"));
             return response.blob();}) // Or response.json() / response.blob()
         .then(blob => {
             

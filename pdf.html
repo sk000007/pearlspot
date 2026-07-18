@@ -32,7 +32,7 @@
 
     <script>
         // Set the worker URL pointing to the cloudflare CDN
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
 
         // Application state tracker
         const state = {
@@ -54,10 +54,15 @@
             
         }).then(data=>{
             console.log('File Content:', data);
-            blob_content = new Uint8Array(data);
+            blob_content = new Uint8Array(data)
+            return pdfjsLib.getDocument({data:blob_content}).promise
+        }).then(pdfDoc=>{
+            state.pdf = pdfDoc;
+                document.getElementById('page_count').textContent = pdfDoc.numPages;
+                renderPage();
         });
         
-        if (blob_content != null) {
+        /*
             console.log('in.........................')
             // Load the PDF Document
             pdfjsLib.getDocument({data:blob_content}).promise.then((pdfDoc) => {
@@ -68,7 +73,7 @@
                 console.error('Error loading PDF: ', err);
                 alert('Failed to load PDF. Check console or CORS settings.');
             });
-        }
+        */
         // Function to render a single targeted page
         function renderPage() {
             state.pdf.getPage(state.currentPage).then((page) => {
